@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="{{.T.Lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{.T.LoginTitle}}</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #1e1f22;
+        color: #f2f3f5;
+      }
+      main {
+        max-width: 28rem;
+        margin: 4rem auto;
+        padding: 1.5rem;
+        background: #2b2d31;
+        border-radius: 0.5rem;
+      }
+      label,
+      p {
+        display: block;
+        color: #a0a3aa;
+      }
+      input {
+        width: 100%;
+        margin: 0.25rem 0 1rem;
+        padding: 0.5rem;
+      }
+      .error {
+        color: #ff6b6b;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Vergnify Admin</h1>
+      {{if .Data.Error}}<p class="error">{{.T.BadLogin}}</p>{{end}}
+      <form method="post" action="/login">
+        <label>{{.T.Email}}<input name="email" type="email" value="{{.Data.Email}}" required /></label>
+        <label>{{.T.Password}}<input name="password" type="password" required /></label>
+        <button type="submit">{{.T.LogIn}}</button>
+      </form>
+    </main>
+  </body>
+</html>

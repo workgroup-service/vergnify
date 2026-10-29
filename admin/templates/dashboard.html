@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="{{.T.Lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vergnify Admin</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #1e1f22;
+        color: #f2f3f5;
+      }
+      main {
+        max-width: 72rem;
+        margin: 4rem auto;
+        padding: 1.5rem;
+        background: #2b2d31;
+        border-radius: 0.5rem;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      p,
+      th {
+        color: #a0a3aa;
+      }
+      a {
+        color: #8ab4f8;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 0.5rem 0.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>{{.T.DeviceList}}</h1>
+        <a href="/invitations">{{.T.Invitations}}</a>
+      </header>
+      {{if .Data.Hosts}}
+      <table>
+        <thead>
+          <tr>
+            <th>{{.T.Email}}</th>
+            <th>{{.T.Device}}</th>
+            <th>OS</th>
+            <th>{{.T.Tools}}</th>
+            <th>{{.T.Alerts}}</th>
+            <th>{{.T.Received}}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Data.Hosts}}
+          <tr>
+            <td>{{.Email}}</td>
+            <td><a href="/hosts/{{.ID}}">{{.Hostname}}</a></td>
+            <td>{{.OS}}</td>
+            <td>{{.ToolCount}}</td>
+            <td>{{.AlertCount}}</td>
+            <td>{{.ReportedAt}}{{if .Stale}} {{$.T.Stale}}{{end}}</td>
+            <td>
+              <form method="post" action="/hosts/{{.ID}}/revoke">
+                <button type="submit">{{$.T.Remove}}</button>
+              </form>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      {{else}}
+      <p>{{.T.NoDevices}}</p>
+      {{end}}
+    </main>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+# @author Cursor
+
+[toolchain]
+channel = "1.90.0"
+components = ["rustfmt", "clippy"]

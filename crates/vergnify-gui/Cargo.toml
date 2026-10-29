@@ -1,0 +1,16 @@
+# @author Cursor
+
+[package]
+name = "vergnify-gui"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "vergnify-gui"
+path = "src/main.rs"
+
+[dependencies]
+gpui = "0.2.2"
+tokio = { workspace = true }
+vergnify-agent = { path = "../vergnify-agent" }
+vergnify-core = { path = "../vergnify-core" }

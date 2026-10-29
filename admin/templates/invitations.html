@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="{{.T.Lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{.T.Invitations}} · Vergnify Admin</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #1e1f22;
+        color: #f2f3f5;
+      }
+      main {
+        max-width: 48rem;
+        margin: 4rem auto;
+        padding: 1.5rem;
+        background: #2b2d31;
+        border-radius: 0.5rem;
+      }
+      p,
+      li {
+        color: #a0a3aa;
+      }
+      a {
+        color: #8ab4f8;
+      }
+      form {
+        display: flex;
+        gap: 0.5rem;
+        margin: 1rem 0;
+      }
+      li form {
+        display: inline;
+        margin-left: 0.5rem;
+      }
+      input {
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="/list">{{.T.DeviceList}}</a></p>
+      <h1>{{.T.Invitations}}</h1>
+      <form method="post" action="/invitations">
+        <input name="email" type="email" required placeholder="{{.T.InviteEmail}}" />
+        <button type="submit">{{.T.Invite}}</button>
+      </form>
+      {{if .Data.Invites}}
+      <h2>{{.T.PendingInvites}}</h2>
+      <ul>
+        {{range .Data.Invites}}
+        <li>{{.Email}} · {{.ExpiresAt}}</li>
+        {{end}}
+      </ul>
+      {{end}}
+      {{if .Data.Members}}
+      <h2>{{.T.Members}}</h2>
+      <ul>
+        {{range .Data.Members}}
+        <li>
+          {{.Email}}{{if .Owner}} {{$.T.OwnerLabel}}{{else}}
+          <form method="post" action="/members/{{.ID}}/remove">
+            <button type="submit">{{$.T.Remove}}</button>
+          </form>
+          {{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{end}}
+    </main>
+  </body>
+</html>

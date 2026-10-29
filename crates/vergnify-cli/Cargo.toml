@@ -1,0 +1,16 @@
+# @author Cursor
+
+[package]
+name = "vergnify-cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+clap = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+vergnify-core = { path = "../vergnify-core" }
+
+[[bin]]
+name = "vergnify"
+path = "src/main.rs"

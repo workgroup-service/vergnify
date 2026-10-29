@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="{{.T.Lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{.T.EnrollTitle}} · Vergnify Admin</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #1e1f22;
+        color: #f2f3f5;
+      }
+      main {
+        max-width: 28rem;
+        margin: 4rem auto;
+        padding: 1.5rem;
+        background: #2b2d31;
+        border-radius: 0.5rem;
+      }
+      p {
+        color: #a0a3aa;
+      }
+      .error {
+        color: #ff6b6b;
+      }
+      input {
+        width: 100%;
+        margin: 0.25rem 0 1rem;
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>{{.T.EnrollTitle}}</h1>
+      {{if .Data.OK}}
+      <p>{{.T.Enrolled}}</p>
+      <p>{{.T.ClosePage}}</p>
+      {{else}}
+      <p>{{.T.EnrollHint}}</p>
+      {{if .Data.Failed}}<p class="error">{{.T.BadCode}}</p>{{end}}
+      <form method="post" action="/enroll">
+        <input name="code" required />
+        <button type="submit">{{.T.Approve}}</button>
+      </form>
+      {{end}}
+    </main>
+  </body>
+</html>

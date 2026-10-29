@@ -1,0 +1,37 @@
+# @author Cursor
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vergnify
+      POSTGRES_PASSWORD: vergnify
+      POSTGRES_DB: vergnify
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vergnify -d vergnify"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports:
+      - "127.0.0.1:8025:8025"
+
+  admin:
+    build: ./admin
+    environment:
+      DATABASE_URL: postgres://vergnify:vergnify@postgres:5432/vergnify?sslmode=disable
+      PUBLIC_URL: http://127.0.0.1:8080
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

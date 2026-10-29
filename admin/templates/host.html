@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="{{.T.Lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{.Data.Hostname}} · Vergnify Admin</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #1e1f22;
+        color: #f2f3f5;
+      }
+      main {
+        max-width: 72rem;
+        margin: 4rem auto;
+        padding: 1.5rem;
+        background: #2b2d31;
+        border-radius: 0.5rem;
+      }
+      a {
+        color: #8ab4f8;
+      }
+      p,
+      th {
+        color: #a0a3aa;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.75rem 0.25rem;
+        border-top: 1px solid #1e1f22;
+      }
+      ul {
+        margin: 0;
+        padding-left: 1.1rem;
+      }
+      li {
+        margin: 0.25rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="/list">{{.T.DeviceList}}</a></p>
+      <h1>{{.Data.Hostname}}</h1>
+      <p>{{.Data.Email}} · {{.Data.OS}} · {{.Data.ReportedAt}}{{if .Data.Stale}} {{.T.Stale}}{{end}}</p>
+      {{if .Data.Tools}}
+      <table>
+        <thead>
+          <tr>
+            <th>{{.T.Tools}}</th>
+            <th>{{.T.Installed}}</th>
+            <th>{{.T.Line}}</th>
+            <th>{{.T.LatestInLine}}</th>
+            <th>{{.T.Status}}</th>
+            <th>{{.T.Vulnerabilities}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Data.Tools}}
+          <tr>
+            <td>{{.Name}}</td>
+            <td>{{.CurrentVersion}}</td>
+            <td>
+              {{.Line}}
+              {{if .Newer}}<br />{{$.T.NewerLines}} {{.Newer}}{{end}}
+            </td>
+            <td>{{.LatestVersion}}</td>
+            <td>{{.Status}}</td>
+            <td>
+              {{if .Vulnerabilities}}
+              <ul>
+                {{range .Vulnerabilities}}
+                <li>
+                  {{if .URL}}<a href="{{.URL}}" target="_blank" rel="noopener noreferrer">{{.ID}}</a>{{else}}{{.ID}}{{end}}
+                  {{.Severity}}
+                  {{if .Title}}· {{.Title}}{{end}}
+                </li>
+                {{end}}
+              </ul>
+              {{else}}
+              {{$.T.NoVulns}}
+              {{end}}
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      {{else}}
+      <p>{{.T.NoTools}}</p>
+      {{end}}
+    </main>
+  </body>
+</html>
