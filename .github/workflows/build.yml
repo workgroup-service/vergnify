@@ -1,0 +1,78 @@
+# @author Cursor
+
+name: Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  build:
+    name: ${{ matrix.archive }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            archive: vergnify-macos-aarch64
+          - os: windows-latest
+            archive: vergnify-windows-x86_64
+          - os: ubuntu-latest
+            archive: vergnify-linux-x86_64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@1.90.0
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Linux libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            pkg-config cmake g++ \
+            libssl-dev libdbus-1-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev \
+            libwayland-dev libwayland-bin \
+            libx11-dev libxcb1-dev libx11-xcb-dev \
+            libxcb-xkb-dev libxcb-xfixes0-dev libxcb-shape0-dev \
+            libvulkan-dev \
+            libfontconfig1-dev libfreetype6-dev
+
+      - name: Metal toolchain
+        if: runner.os == 'macOS'
+        run: |
+          if ! xcrun -sdk macosx metal --version >/dev/null 2>&1; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+
+      - name: Build
+        run: cargo build --release -p vergnify-cli -p vergnify-gui -p vergnify-agent
+
+      - name: Collect binaries
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp target/release/vergnify.exe dist/
+            cp target/release/vergnify-gui.exe dist/
+            cp target/release/vergnify-agent.exe dist/
+          else
+            cp target/release/vergnify dist/
+            cp target/release/vergnify-gui dist/
+            cp target/release/vergnify-agent dist/
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive }}
+          path: dist/*
+          retention-days: 90
+          if-no-files-found: error

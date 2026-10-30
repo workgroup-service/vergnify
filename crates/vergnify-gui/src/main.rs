@@ -296,6 +296,15 @@ fn tool_row(tool: &ToolItem, palette: Palette, cx: &mut Context<Toolbox>) -> Div
                         .child(badge(label, foreground, background)),
                 ),
         )
+        .when(!tool.binary_path.is_empty(), |row| {
+            row.child(
+                div()
+                    .w_full()
+                    .text_xs()
+                    .text_color(rgb(palette.muted))
+                    .child(tool.binary_path.clone()),
+            )
+        })
         .when(!tool.vulnerabilities.is_empty(), |row| {
             row.child(vuln_line(tool, palette, cx))
         })
@@ -1039,10 +1048,13 @@ fn copy_icon(color: u32, fill: u32) -> Div {
 
 #[cfg(target_os = "macos")]
 fn use_menu_bar_name() {
-    if std::env::current_exe().ok().is_some_and(|path| {
+    if let Some(exe) = std::env::current_exe().ok().filter(|path| {
         path.components()
             .any(|component| component.as_os_str() == "Vergnify.app")
     }) {
+        if let Some(contents) = exe.parent().and_then(|macos| macos.parent()) {
+            install_app_icon(contents);
+        }
         return;
     }
     let Ok(exe) = std::env::current_exe() else {
@@ -1059,6 +1071,7 @@ fn use_menu_bar_name() {
     }
     let _ = std::fs::write(contents.join("Info.plist"), VERGNIFY_INFO_PLIST);
     let _ = std::fs::write(contents.join("PkgInfo"), "APPL????");
+    install_app_icon(&contents);
     let bundled = macos.join("Vergnify");
     if !same_inode(&exe, &bundled) {
         let _ = std::fs::remove_file(&bundled);
@@ -1084,6 +1097,8 @@ const VERGNIFY_INFO_PLIST: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
   <string>Vergnify</string>
   <key>CFBundleIdentifier</key>
   <string>com.vergnify.gui</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleInfoDictionaryVersion</key>
@@ -1093,6 +1108,18 @@ const VERGNIFY_INFO_PLIST: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
 </dict>
 </plist>
 "#;
+
+#[cfg(target_os = "macos")]
+fn install_app_icon(contents: &std::path::Path) {
+    let resources = contents.join("Resources");
+    if std::fs::create_dir_all(&resources).is_err() {
+        return;
+    }
+    let _ = std::fs::write(
+        resources.join("AppIcon.icns"),
+        include_bytes!("../assets/AppIcon.icns"),
+    );
+}
 
 #[cfg(target_os = "macos")]
 fn same_inode(left: &std::path::Path, right: &std::path::Path) -> bool {
